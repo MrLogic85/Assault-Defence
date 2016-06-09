@@ -35,7 +35,8 @@ public class Motor : TurretComponent
                 currentRotation += 360;
             }
 
-            if (target == null)
+            float offset = 0;
+            if (target == null || !base.GetAimOffsetWeight(out offset))
             {
                 // Reset rotation
                 if (Math.Abs(currentRotation) > step)
@@ -44,14 +45,13 @@ public class Motor : TurretComponent
                 }
                 continue;
             }
-
-            float offset = base.GetAimOffset();
-
+            
             // Try to rotate in lastDirection
             if (engineJoint.maxAngle >= 360 || Math.Abs(currentRotation + lastDierction * step) <= engineJoint.maxAngle)
             {
                 engineJoint.joint.Rotate(0, lastDierction * step, 0);
-                float newOffset = base.GetAimOffset();
+                float newOffset;
+                base.GetAimOffsetWeight(out newOffset);
                 if (newOffset < offset)
                 {
                     continue;
@@ -66,7 +66,8 @@ public class Motor : TurretComponent
             if (engineJoint.maxAngle >=360 || Math.Abs(currentRotation - lastDierction * step) <= engineJoint.maxAngle)
             {
                 engineJoint.joint.Rotate(0, -lastDierction * step, 0);
-                float newOffset = base.GetAimOffset();
+                float newOffset;
+                base.GetAimOffsetWeight(out newOffset);
                 if (newOffset < offset)
                 {
                     lastDierction *= -1;
@@ -92,10 +93,12 @@ public class Motor : TurretComponent
         slots[0].armament = armament;
     }
 
-    internal override float GetAimOffset()
+    internal override Boolean GetAimOffsetWeight(out float offset)
     {
         // Return a smaller value for motors to decrease the weight of weapons which has their own motors
-        return base.GetAimOffset() / 2f;
+        Boolean hasTarget = base.GetAimOffsetWeight(out offset);
+        offset /= 2f;
+        return hasTarget;
     }
 
     private Vector3 ProjectPointOnPlane(Vector3 planeNormal, Vector3 planePoint, Vector3 point)

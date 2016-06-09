@@ -11,6 +11,6 @@ public class WeaponScriptEditor : Editor
         base.OnInspectorGUI();
         Weapon weapon = (Weapon)target;
         float speed = weapon.projectileSpeed;
-        EditorGUILayout.FloatField("Approximal Damage", weapon.projectilePrefab.CalculateDamage(speed) * weapon.projectileSpawn.Length * weapon.rateOfFire);
+        EditorGUILayout.FloatField("Approximal Damage", weapon.CalculateDamagePotential());
     }
 }

@@ -9,7 +9,7 @@ public class Weapon : TurretComponent
     public Projectile projectilePrefab;
     public float rateOfFire = 2;
     public float projectileSpeed = 20;
-    public float projectileRange = 2;
+    public float projectileRange = 20;
     public float recoil = 0.2f;
     [Range (0, 1)]
     public float recoilResetTime = 0.1f;
@@ -34,10 +34,13 @@ public class Weapon : TurretComponent
     {
         if (nextShotTime < Time.time)
         {
-            if (HasTarget() && GetAimOffset() < spreadAngle + aimPrecisionFire)
+            if (HasTarget())
             {
-                nextShotTime = Time.time + 1 / rateOfFire;
-                ShootProjectile();
+                if (Vector3.Angle(transform.forward, GetAimDirection()) < spreadAngle + aimPrecisionFire)
+                {
+                    nextShotTime = Time.time + 1 / rateOfFire;
+                    ShootProjectile();
+                }
             }
         }
     }
@@ -82,7 +85,7 @@ public class Weapon : TurretComponent
 
     private Vector3 GetAimDirection()
     {
-        if (target != null)
+        if (HasTarget())
         {
             Vector3 targetPos = target.aimPoint.transform.position;
             Vector3 targetDir = targetPos - transform.position;
@@ -113,12 +116,19 @@ public class Weapon : TurretComponent
         return Vector3.forward;
     }
 
-    internal override float GetAimOffset()
+    internal override Boolean GetAimOffsetWeight(out float offset)
     {
-        if (target != null)
+        Boolean baseHasTarget = base.GetAimOffsetWeight(out offset);
+        if (HasTarget())
         {
-            return Vector3.Angle(transform.forward, GetAimDirection());
+            offset += Vector3.Angle(transform.forward, GetAimDirection()) * CalculateDamagePotential();
+            return true;
         }
-        return 0;
+        return baseHasTarget;
+    }
+
+    internal float CalculateDamagePotential()
+    {
+        return projectilePrefab.CalculateDamage(projectileSpeed) * projectileSpawn.Length * rateOfFire;
     }
 }

@@ -22,17 +22,23 @@ public class TurretComponent : MonoBehaviour {
 
     internal virtual void FittedOn(Armament armament) { }
 
-    internal virtual float GetAimOffset()
+    internal virtual Boolean GetAimOffsetWeight(out float offset)
     {
-        float offset = 0f;
+        Boolean hasTarget = false;
+        offset = 0;
         for (int i = 0; i < slots.Length; i++)
         {
             if (slots[i].component != null)
             {
-                offset += slots[i].component.GetAimOffset();
+                float getOffset;
+                if (slots[i].component.GetAimOffsetWeight(out getOffset))
+                {
+                    offset += getOffset;
+                    hasTarget = true;
+                }
             }
         }
-        return offset;
+        return hasTarget;
     }
 
     private void InstantiateComponentAt(TurretComponent comp, int i)
