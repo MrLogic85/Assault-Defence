@@ -8,23 +8,26 @@ public class TurretComponent : MonoBehaviour {
     public Fitting fitting;
     public Slot[] slots;
 
-    public virtual void SetTarget(Enemy target)
+    internal Enemy target;
+
+    public virtual void SetTarget(Enemy enemy)
     {
+        target = enemy;
         for (int i = 0; i < slots.Length; i++)
         {
             Slot slot = slots[i];
             if (slot.component != null)
             {
-                slot.component.SetTarget(target);
+                slot.component.SetTarget(enemy);
             }
         }
     }
 
     internal virtual void FittedOn(Armament armament) { }
 
-    internal virtual Boolean GetAimOffsetWeight(out float offset)
+    internal virtual bool GetAimOffsetWeight(out float offset)
     {
-        Boolean hasTarget = false;
+        bool hasTarget = false;
         offset = 0;
         for (int i = 0; i < slots.Length; i++)
         {
@@ -41,7 +44,7 @@ public class TurretComponent : MonoBehaviour {
         return hasTarget;
     }
 
-    private void InstantiateComponentAt(TurretComponent comp, int i)
+    internal void InstantiateComponentAt(TurretComponent comp, int i)
     {
         TurretComponent instance = Instantiate(comp, slots[i].transform.position, slots[i].transform.rotation) as TurretComponent;
         instance.transform.parent = slots[i].transform;
@@ -50,7 +53,7 @@ public class TurretComponent : MonoBehaviour {
     }
 
     // ==== DEBUG ====
-    internal void BuildRandom()
+    internal virtual void BuildRandom()
     {
         for (int i = 0; i < slots.Length; i++)
         {

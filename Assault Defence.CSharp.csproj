@@ -69,6 +69,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\AudioManager.cs" />
     <Compile Include="Assets\Scripts\Enemy.cs" />
     <Compile Include="Assets\Scripts\PlayerController.cs" />
     <Compile Include="Assets\Scripts\Projectile.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="Assets\Scripts\Turret Components\Fitting.cs" />
     <Compile Include="Assets\Scripts\Turret Components\Parts\Base.cs" />
     <Compile Include="Assets\Scripts\Turret Components\Parts\Motor.cs" />
+    <Compile Include="Assets\Scripts\Turret Components\Parts\Shield.cs" />
     <Compile Include="Assets\Scripts\Turret Components\Parts\Weapon.cs" />
     <Compile Include="Assets\Scripts\Turret Components\Size.cs" />
     <Compile Include="Assets\Scripts\Turret Components\Slot.cs" />
@@ -87,13 +89,7 @@
     <Compile Include="Assets\Scripts\TurretComponentLibrary.cs" />
     <Compile Include="Assets\Scripts\TurretController.cs" />
     <Compile Include="Assets\Scripts\UI.cs" />
-    <Compile Include="Assets\WarZone\CrossPlatformInput\Scripts\CrossPlatformInputManager.cs" />
-    <Compile Include="Assets\WarZone\CrossPlatformInput\Scripts\PlatformSpecific\MobileInput.cs" />
-    <Compile Include="Assets\WarZone\CrossPlatformInput\Scripts\PlatformSpecific\StandaloneInput.cs" />
-    <Compile Include="Assets\WarZone\CrossPlatformInput\Scripts\VirtualInput.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Assets\WarZone\Vehicles\Car\CarGuidelines.txt" />
+    <Compile Include="Assets\Scripts\Util.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />
 </Project>

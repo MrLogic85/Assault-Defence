@@ -1,11 +1,10 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System;
 
-public class TurretController : MonoBehaviour {
-	
-	// Update is called once per frame
-	void Update ()
+public class TurretController : MonoBehaviour
+{
+
+    // Update is called once per frame
+    void Update()
     {
         TurretBasePos[] turrets = FindObjectsOfType<TurretBasePos>();
         for (int i = 0; i < turrets.Length; i++)
@@ -13,7 +12,7 @@ public class TurretController : MonoBehaviour {
             TurretBasePos turret = turrets[i];
             Update(turret);
         }
-	}
+    }
 
     private void Update(TurretBasePos turret)
     {

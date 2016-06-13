@@ -10,11 +10,11 @@ public class UI : MonoBehaviour {
         Base[] bases = TurretComponentLibrary.instance.GetBases();
         for (int i = 0; i < bases.Length; i++)
         {
-            GUIText baseName = 
-            GUITexture baseTexture = bases[i].GetComponent<GUITexture>();
+            //GUIText baseName = 
+            /*GUITexture baseTexture = bases[i].GetComponent<GUITexture>();
             if (baseTexture != null)
             {
-            }
+            }*/
         }
 	}
 	

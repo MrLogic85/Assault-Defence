@@ -24,7 +24,7 @@ public class TurretComponentLibrary : MonoBehaviour
         return bases;
     }
 
-    internal TurretComponent[] GetComponentsMatching(Slot slot)
+    internal TurretComponent[] GetComponentsMatching(Slot slot, Type filter = null)
     {
         TurretComponent[] components = new TurretComponent[parts.Length + utilities.Length + weapons.Length];
         Array.Copy(parts, components, parts.Length);
@@ -44,6 +44,11 @@ public class TurretComponentLibrary : MonoBehaviour
             if (!fitting.armament.Fits(slot.armament))
             {
                 // Make sure tha armament type can fit in the slot
+                continue;
+            }
+            if (filter != null && component.GetType() != filter)
+            {
+                // Make sure the object is of the corect type
                 continue;
             }
             // else

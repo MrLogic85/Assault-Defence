@@ -1,12 +1,13 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
 
 public class Weapon : TurretComponent
 {
     [Header ("Weapon")]
-    public Transform[] projectileSpawn;
+    public ProjectileSpawn[] projectileSpawn;
     public Projectile projectilePrefab;
+    public AudioClip[] fireSounds;
+    public float flashTime = 0.1f;
     public float rateOfFire = 2;
     public float projectileSpeed = 20;
     public float projectileRange = 20;
@@ -19,8 +20,7 @@ public class Weapon : TurretComponent
     public float aimPrecisionFire = 5;
 
     private float nextShotTime;
-
-    private Enemy target;
+    
     private Vector3 recoilVel;
 
     // Update is called once per frame
@@ -45,23 +45,43 @@ public class Weapon : TurretComponent
         }
     }
 
-    public override void SetTarget(Enemy enemy)
-    {
-        base.SetTarget(enemy);
-        target = enemy;
-    }
-
     private void ShootProjectile()
     {
+        // Fire
         for (int i = 0; i < projectileSpawn.Length; i++)
         {
-            Projectile projectile = Instantiate(projectilePrefab, projectileSpawn[i].position, projectileSpawn[i].rotation) as Projectile;
+            Projectile projectile = Instantiate(projectilePrefab, projectileSpawn[i].point.position, projectileSpawn[i].point.rotation) as Projectile;
             projectile.SetSpeed(projectileSpeed);
             projectile.SetRange(projectileRange);
+
+            // Show muzzle flash
+            GameObject flash = Util.GetRandomItem(projectileSpawn[i].muzzleFlash);
+            if (flash != null)
+            {
+                flash.SetActive(true);
+            }
+        }
+        Invoke("DectivateFlash", flashTime);
+
+        // Play sound
+        if (fireSounds != null)
+        {
+            AudioManager.Instance.PlaySoundAt(Util.GetRandomItem(fireSounds), transform.position);
         }
 
         // Recoil
         transform.position -= transform.forward * recoil;
+    }
+
+    private void DectivateFlash()
+    {
+        for (int i = 0; i < projectileSpawn.Length; i++)
+        {
+            for (int j = 0; j < projectileSpawn[i].muzzleFlash.Length; j++)
+            {
+                projectileSpawn[i].muzzleFlash[j].SetActive(false);
+            }
+        }
     }
 
     private bool HasTarget()
@@ -88,7 +108,14 @@ public class Weapon : TurretComponent
         if (HasTarget())
         {
             Vector3 targetPos = target.aimPoint.transform.position;
-            Vector3 targetDir = targetPos - transform.position;
+            Vector3 spawnPos = new Vector3();
+            for (int i = 0; i < projectileSpawn.Length; i++)
+            {
+                spawnPos += projectileSpawn[i].point.transform.position;
+            }
+            spawnPos /= projectileSpawn.Length;
+            Vector3 targetDir = target.aimPoint.transform.position - spawnPos;
+
             if (projectilePrefab.GetComponent<Rigidbody>() == null
                 || !projectilePrefab.GetComponent<Rigidbody>().useGravity)
             {
@@ -116,12 +143,18 @@ public class Weapon : TurretComponent
         return Vector3.forward;
     }
 
-    internal override Boolean GetAimOffsetWeight(out float offset)
+    internal override bool GetAimOffsetWeight(out float offset)
     {
-        Boolean baseHasTarget = base.GetAimOffsetWeight(out offset);
+        bool baseHasTarget = base.GetAimOffsetWeight(out offset);
         if (HasTarget())
         {
-            offset += Vector3.Angle(transform.forward, GetAimDirection()) * CalculateDamagePotential();
+            Vector3 spawnForward = new Vector3();
+            for (int i = 0; i < projectileSpawn.Length; i++)
+            {
+                spawnForward += projectileSpawn[i].point.transform.forward;
+            }
+            spawnForward /= projectileSpawn.Length;
+            offset += Vector3.Angle(spawnForward, GetAimDirection()) * CalculateDamagePotential();
             return true;
         }
         return baseHasTarget;
@@ -129,6 +162,17 @@ public class Weapon : TurretComponent
 
     internal float CalculateDamagePotential()
     {
+        if (nextShotTime > Time.time)
+        {
+            return projectilePrefab.CalculateDamage(projectileSpeed) * projectileSpawn.Length * rateOfFire * (1f / rateOfFire - nextShotTime + Time.time) * rateOfFire;
+        }
         return projectilePrefab.CalculateDamage(projectileSpeed) * projectileSpawn.Length * rateOfFire;
+    }
+
+    [System.Serializable]
+    public struct ProjectileSpawn
+    {
+        public Transform point;
+        public GameObject[] muzzleFlash;
     }
 }

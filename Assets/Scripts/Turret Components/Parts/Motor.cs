@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System;
 
 public class Motor : TurretComponent
@@ -10,8 +9,7 @@ public class Motor : TurretComponent
     public float turnSpeed = 20;
     [Tooltip("Max weight in kilos before the motor stops")]
     public float maxWeight = 90;
-
-    private Enemy target;
+    
     private float lastDierction = 1;
 
     // Update is called once per frame
@@ -36,7 +34,7 @@ public class Motor : TurretComponent
             }
 
             float offset = 0;
-            if (target == null || !base.GetAimOffsetWeight(out offset))
+            if (!base.GetAimOffsetWeight(out offset))
             {
                 // Reset rotation
                 if (Math.Abs(currentRotation) > step)
@@ -81,22 +79,16 @@ public class Motor : TurretComponent
         }
     }
 
-    public override void SetTarget(Enemy enemy)
-    {
-        base.SetTarget(enemy);
-        target = enemy;
-    }
-
-    // A motor has the same armament as the lost it was fitted on.
+    // A motor has the same armament as the slot it was fitted on.
     internal override void FittedOn(Armament armament)
     {
         slots[0].armament = armament;
     }
 
-    internal override Boolean GetAimOffsetWeight(out float offset)
+    internal override bool GetAimOffsetWeight(out float offset)
     {
         // Return a smaller value for motors to decrease the weight of weapons which has their own motors
-        Boolean hasTarget = base.GetAimOffsetWeight(out offset);
+        bool hasTarget = base.GetAimOffsetWeight(out offset);
         offset /= 2f;
         return hasTarget;
     }
