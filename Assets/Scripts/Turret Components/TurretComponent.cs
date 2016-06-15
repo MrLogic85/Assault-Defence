@@ -2,20 +2,49 @@
 using System.Collections;
 using System;
 
-public class TurretComponent : MonoBehaviour {
+public class TurretComponent : MonoBehaviour
+{
 
-    [Header ("Slots")]
+    [Header("Slots")]
     public Fitting fitting;
     public Slot[] slots;
 
+    internal Action onFittedEvent;
+
     internal Enemy target;
+    internal TurretComponent parentComponent;
+
+    public void Start()
+    {
+        //FindComponents();
+    }
+
+    private void FindComponents()
+    {
+        foreach (Slot slot in slots)
+        {
+            foreach (Transform child in slot.transform)
+            {
+                slot.component = child.gameObject.GetComponent<TurretComponent>();
+                if (slot.component != null)
+                {
+                    slot.component.FittedOn(this, slot.armament);
+                    break;
+                }
+            }
+        }
+    }
+
+    internal virtual Turret GetTurret()
+    {
+        return parentComponent.GetTurret();
+    }
 
     public virtual void SetTarget(Enemy enemy)
     {
         target = enemy;
-        for (int i = 0; i < slots.Length; i++)
+        foreach (Slot slot in slots)
         {
-            Slot slot = slots[i];
             if (slot.component != null)
             {
                 slot.component.SetTarget(enemy);
@@ -23,18 +52,25 @@ public class TurretComponent : MonoBehaviour {
         }
     }
 
-    internal virtual void FittedOn(Armament armament) { }
+    internal virtual void FittedOn(TurretComponent component, Armament armament)
+    {
+        parentComponent = component;
+        if (onFittedEvent != null)
+        {
+            onFittedEvent.Invoke();
+        }
+    }
 
     internal virtual bool GetAimOffsetWeight(out float offset)
     {
         bool hasTarget = false;
         offset = 0;
-        for (int i = 0; i < slots.Length; i++)
+        foreach (Slot slot in slots)
         {
-            if (slots[i].component != null)
+            if (slot.component != null)
             {
                 float getOffset;
-                if (slots[i].component.GetAimOffsetWeight(out getOffset))
+                if (slot.component.GetAimOffsetWeight(out getOffset))
                 {
                     offset += getOffset;
                     hasTarget = true;
@@ -44,26 +80,29 @@ public class TurretComponent : MonoBehaviour {
         return hasTarget;
     }
 
-    internal void InstantiateComponentAt(TurretComponent comp, int i)
+    internal void InstantiateComponentAt(TurretComponent comp, Slot slot)
     {
-        TurretComponent instance = Instantiate(comp, slots[i].transform.position, slots[i].transform.rotation) as TurretComponent;
-        instance.transform.parent = slots[i].transform;
-        slots[i].component = instance;
-        instance.FittedOn(slots[i].armament);
+        TurretComponent instance = Instantiate(comp, slot.transform.position, slot.transform.rotation) as TurretComponent;
+        instance.transform.parent = slot.transform;
+        slot.component = instance;
+        instance.FittedOn(this, slot.armament);
     }
 
     // ==== DEBUG ====
     internal virtual void BuildRandom()
     {
-        for (int i = 0; i < slots.Length; i++)
+        foreach (Slot slot in slots)
         {
-            Slot slot = slots[i];
-            TurretComponent[] components = TurretComponentLibrary.instance.GetComponentsMatching(slot);
-            if (components.Length > 0)
+            TurretComponentLibrary library = FindObjectOfType<TurretComponentLibrary>();
+            if (library != null)
             {
-                TurretComponent baseComponent = components[UnityEngine.Random.Range(0, components.Length)];
-                InstantiateComponentAt(baseComponent, i);
-                slot.component.BuildRandom();
+                TurretComponent[] components = library.GetComponentsMatching(slot);
+                if (components.Length > 0)
+                {
+                    TurretComponent baseComponent = components[UnityEngine.Random.Range(0, components.Length)];
+                    InstantiateComponentAt(baseComponent, slot);
+                    slot.component.BuildRandom();
+                }
             }
         }
     }

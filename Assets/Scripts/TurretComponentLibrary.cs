@@ -51,6 +51,14 @@ public class TurretComponentLibrary : MonoBehaviour
                 // Make sure the object is of the corect type
                 continue;
             }
+            if (Debug.isDebugBuild)
+            {
+                if (filter == null && slot.armament == Armament.Part && fitting.armament != Armament.Part)
+                {
+                    // If slot is part, then lets select a part to make bigger turrets
+                    continue;
+                }
+            }
             // else
             filteredComponents.Add(component);
         }

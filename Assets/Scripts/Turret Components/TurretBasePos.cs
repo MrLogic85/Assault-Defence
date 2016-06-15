@@ -1,10 +1,18 @@
 ﻿using UnityEngine;
 
 public class TurretBasePos : MonoBehaviour {
+    public int generateSeed;
+
     private Base turretBase;
 
     // Use this for initialization
     void Start () {
+        if (transform.childCount > 0)
+        {
+            // We are already built, rebuild a new turret
+            DebugCreateNewTurret();
+        }
+        //FindBase();
 	}
 
     // Update is called once per frame
@@ -16,7 +24,14 @@ public class TurretBasePos : MonoBehaviour {
     {
         if (turretBase != null)
         {
-            Destroy(turretBase.gameObject);
+            if (Application.isEditor)
+            {
+                DestroyImmediate(turretBase.gameObject);
+            }
+            else
+            {
+                Destroy(turretBase.gameObject);
+            }
         }
     }
 
@@ -28,25 +43,44 @@ public class TurretBasePos : MonoBehaviour {
 
     // ==== DEBUG ====
 
-    internal void DebugCreateNewTurret()
+    public void DebugCreateNewTurret()
     {
+        FindBase();
         DestroyTurret();
         BuildRandom();
     }
 
-    private void BuildRandom()
+    private void FindBase()
+    {
+        foreach (Transform child in transform)
+        {
+            turretBase = child.gameObject.GetComponent<Base>();
+            if (turretBase != null)
+            {
+                break;
+            }
+        }
+    }
+
+    public void BuildRandom()
     {
         if (turretBase != null)
         {
             DestroyTurret();
         }
+        
+        Random.seed = generateSeed;
 
-        Base[] bases = TurretComponentLibrary.instance.GetBases();
-        if (bases.Length > 0)
+        TurretComponentLibrary library = FindObjectOfType<TurretComponentLibrary>();
+        if (library != null)
         {
-            Base baseComponent = bases[Random.Range(0, bases.Length)];
-            InstantiateBase(baseComponent);
-            turretBase.BuildRandom();
+            Base[] bases = library.GetBases();
+            if (bases.Length > 0)
+            {
+                Base baseComponent = bases[Random.Range(0, bases.Length)];
+                InstantiateBase(baseComponent);
+                turretBase.BuildRandom();
+            }
         }
     }
 }

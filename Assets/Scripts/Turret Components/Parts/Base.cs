@@ -1,20 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent (typeof (Turret))]
 public class Base : TurretComponent
 {
+    private Turret turret;
+
+    internal override Turret GetTurret()
+    {
+        if (turret == null)
+        {
+            turret = GetComponent<Turret>();
+        }
+        return turret;
+    }
+
     // ==== DEBUG ====
     internal override void BuildRandom()
     {
-        for (int i = 0; i < slots.Length; i++)
+        foreach (Slot slot in slots)
         {
-            Slot slot = slots[i];
-            TurretComponent[] components = TurretComponentLibrary.instance.GetComponentsMatching(slot, typeof (Motor));
-            if (components.Length > 0)
+            TurretComponentLibrary library = FindObjectOfType<TurretComponentLibrary>();
+            if (library != null)
             {
-                TurretComponent baseComponent = components[UnityEngine.Random.Range(0, components.Length)];
-                InstantiateComponentAt(baseComponent, i);
-                slot.component.BuildRandom();
+                TurretComponent[] components = library.GetComponentsMatching(slot, typeof(Motor));
+                if (components.Length > 0)
+                {
+                    TurretComponent baseComponent = components[UnityEngine.Random.Range(0, components.Length)];
+                    InstantiateComponentAt(baseComponent, slot);
+                    slot.component.BuildRandom();
+                }
             }
         }
     }

@@ -16,8 +16,8 @@ public class Weapon : TurretComponent
     public float recoilResetTime = 0.1f;
     [Range(0, 90)]
     public float spreadAngle = 0;
-    [Range(0, 90)]
-    public float aimPrecisionFire = 5;
+
+    private static string[] layerMask = new string[] { "Ground", "Enemy", "Turret" };
 
     private float nextShotTime;
     
@@ -36,13 +36,32 @@ public class Weapon : TurretComponent
         {
             if (HasTarget())
             {
-                if (Vector3.Angle(transform.forward, GetAimDirection()) < spreadAngle + aimPrecisionFire)
+                Vector3 spawnPos;
+                Vector3 spawnForward;
+                GetSpawnPosAndDirection(out spawnPos, out spawnForward);
+                Ray ray = new Ray(spawnPos, spawnForward);
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit, projectileRange, LayerMask.GetMask(layerMask))
+                    && hit.collider.GetComponent<Enemy>() != null)
                 {
                     nextShotTime = Time.time + 1 / rateOfFire;
                     ShootProjectile();
                 }
             }
         }
+    }
+
+    private void GetSpawnPosAndDirection(out Vector3 spawnPos, out Vector3 spawnForward)
+    {
+        spawnPos = new Vector3();
+        spawnForward = new Vector3();
+        for (int i = 0; i < projectileSpawn.Length; i++)
+        {
+            spawnPos += projectileSpawn[i].point.transform.position;
+            spawnForward += projectileSpawn[i].point.transform.forward;
+        }
+        spawnPos /= projectileSpawn.Length;
+        spawnForward /= projectileSpawn.Length;
     }
 
     private void ShootProjectile()
@@ -108,13 +127,9 @@ public class Weapon : TurretComponent
         if (HasTarget())
         {
             Vector3 targetPos = target.aimPoint.transform.position;
-            Vector3 spawnPos = new Vector3();
-            for (int i = 0; i < projectileSpawn.Length; i++)
-            {
-                spawnPos += projectileSpawn[i].point.transform.position;
-            }
-            spawnPos /= projectileSpawn.Length;
-            Vector3 targetDir = target.aimPoint.transform.position - spawnPos;
+            Vector3 spawnPos, spawnForward;
+            GetSpawnPosAndDirection(out spawnPos, out spawnForward);
+            Vector3 targetDir = targetPos - spawnPos;
 
             if (projectilePrefab.GetComponent<Rigidbody>() == null
                 || !projectilePrefab.GetComponent<Rigidbody>().useGravity)
@@ -148,19 +163,15 @@ public class Weapon : TurretComponent
         bool baseHasTarget = base.GetAimOffsetWeight(out offset);
         if (HasTarget())
         {
-            Vector3 spawnForward = new Vector3();
-            for (int i = 0; i < projectileSpawn.Length; i++)
-            {
-                spawnForward += projectileSpawn[i].point.transform.forward;
-            }
-            spawnForward /= projectileSpawn.Length;
+            Vector3 spawnPos, spawnForward;
+            GetSpawnPosAndDirection(out spawnPos, out spawnForward);
             offset += Vector3.Angle(spawnForward, GetAimDirection()) * CalculateDamagePotential();
             return true;
         }
         return baseHasTarget;
     }
 
-    internal float CalculateDamagePotential()
+    public float CalculateDamagePotential()
     {
         if (nextShotTime > Time.time)
         {

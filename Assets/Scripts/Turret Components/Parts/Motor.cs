@@ -80,8 +80,9 @@ public class Motor : TurretComponent
     }
 
     // A motor has the same armament as the slot it was fitted on.
-    internal override void FittedOn(Armament armament)
+    internal override void FittedOn(TurretComponent component, Armament armament)
     {
+        base.FittedOn(component, armament);
         slots[0].armament = armament;
     }
 
