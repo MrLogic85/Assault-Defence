@@ -8,6 +8,8 @@ public class TurretComponent : MonoBehaviour
     [Header("Slots")]
     public Fitting fitting;
     public Slot[] slots;
+    [Header("Characteristics")]
+    public float weight;
 
     internal Enemy target;
     internal TurretComponent parentComponent;
@@ -16,7 +18,12 @@ public class TurretComponent : MonoBehaviour
     // ==== EVENTS ====
     internal Action<TurretComponent, Armament> onFittedEvent;
     // In params, current aim offset, has children target. Retuns new aim and if component wants to aim or not
-    internal List<Func<float, bool, KeyValuePair<float, bool>>> componentAimWeight = new List<Func<float, bool, KeyValuePair<float, bool>>>();
+    internal List<Func<float, bool, KeyValuePair<float, bool>>> onComponenGetAimWeightEvent = new List<Func<float, bool, KeyValuePair<float, bool>>>();
+
+    public void Awake()
+    {
+
+    }
 
     public void Start()
     {
@@ -39,9 +46,14 @@ public class TurretComponent : MonoBehaviour
         }
     }
 
-    internal virtual Turret GetTurret()
+    internal virtual bool GetTurret(out Turret turret)
     {
-        return parentComponent.GetTurret();
+        if (parentComponent == null)
+        {
+            turret = null;
+            return false;
+        }
+        return parentComponent.GetTurret(out turret);
     }
 
     public virtual void SetTarget(Enemy enemy)
@@ -84,7 +96,7 @@ public class TurretComponent : MonoBehaviour
             }
         }
         // Let each component modify the aim, a motor will for instance reduce the offset and a weapon will add the the offset
-        foreach (Func<float, bool, KeyValuePair<float, bool>> aimMethod in componentAimWeight)
+        foreach (Func<float, bool, KeyValuePair<float, bool>> aimMethod in onComponenGetAimWeightEvent)
         {
             KeyValuePair<float, bool> result = aimMethod(offset, hasTarget);
             if (result.Value)

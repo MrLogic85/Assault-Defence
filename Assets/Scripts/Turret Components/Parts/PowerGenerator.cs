@@ -15,9 +15,10 @@ public class PowerGenerator : MonoBehaviour
 
     // Update is called once per frame
     void Update () {
-        if (component.GetTurret() != null)
+        Turret turret;
+        if (component.GetTurret(out turret))
         {
-            component.GetTurret().ProducePower(production * Time.deltaTime);
+            turret.ProducePower(production * Time.deltaTime);
         }
 	}
 }

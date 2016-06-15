@@ -432,6 +432,7 @@ MonoBehaviour:
   - {fileID: 11481898}
   - {fileID: 11483702}
   - {fileID: 11487338}
+  weight: 0
 --- !u!114 &11481898
 MonoBehaviour:
   m_ObjectHideFlags: 1

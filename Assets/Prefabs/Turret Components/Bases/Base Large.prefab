@@ -28,6 +28,8 @@ GameObject:
   - 4: {fileID: 434596}
   - 114: {fileID: 11483686}
   - 114: {fileID: 11471406}
+  - 114: {fileID: 11405158}
+  - 114: {fileID: 11471526}
   m_Layer: 9
   m_Name: Base Large
   m_TagString: Untagged
@@ -211,6 +213,18 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &11405158
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 163492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2879d9310ce43764aabbc7b28f0d7a6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  production: 25
 --- !u!114 &11471406
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -222,6 +236,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 076945f466a595d499792aef522ceb95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11471526
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 163492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65d187deb29891a43ac2dc2fb9f310a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  capacity: 25
+  glowMaterial: {fileID: 0}
+  maxIntensity: 1
 --- !u!114 &11483686
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -238,6 +266,7 @@ MonoBehaviour:
     armament: 0
   slots:
   - {fileID: 11490602}
+  weight: 0
 --- !u!114 &11490602
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -6,13 +6,14 @@ public class Base : TurretComponent
 {
     private Turret turret;
 
-    internal override Turret GetTurret()
+    internal override bool GetTurret(out Turret _turret)
     {
         if (turret == null)
         {
             turret = GetComponent<Turret>();
         }
-        return turret;
+        _turret = turret;
+        return turret != null;
     }
 
     // ==== DEBUG ====

@@ -44,6 +44,8 @@ public class Turret : MonoBehaviour
         return closestEnemy;
     }
 
+    // ==== POWER ====
+
     internal void RegisterBatery(Battery battery)
     {
         print("Battery registered");

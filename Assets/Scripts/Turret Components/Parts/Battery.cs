@@ -5,6 +5,8 @@ using System;
 [RequireComponent (typeof (TurretComponent))]
 public class Battery : MonoBehaviour {
     public float capacity = 100;
+    public Renderer glowMaterial;
+    public float maxIntensity = 1;
 
     private float storedPower = 0;
     private TurretComponent component;
@@ -12,40 +14,69 @@ public class Battery : MonoBehaviour {
     void Start()
     {
         component = GetComponent<TurretComponent>();
-        if (component.parentComponent != null)
+        Turret turret;
+        if (component.GetTurret(out turret))
         {
-            component.GetTurret().RegisterBatery(this);
+            turret.RegisterBatery(this);
         }
         else
         {
             component.onFittedEvent += Fitted;
         }
+
+        UpdateGlow();
     }
 
     private void Fitted(TurretComponent component, Armament arment)
     {
-        component.GetTurret().RegisterBatery(this);
+        Turret turret;
+        if (component.GetTurret(out turret))
+        {
+            turret.RegisterBatery(this);
+        }
+    }
+
+    private Color originalGlowColor;
+    private bool isOrigColorSet;
+    private void UpdateGlow()
+    {
+        if (glowMaterial != null)
+        {
+            if (!isOrigColorSet)
+            {
+                originalGlowColor = glowMaterial.material.GetColor("_EmissionColor");
+                isOrigColorSet = true;
+            }
+            glowMaterial.material.SetColor("_EmissionColor", originalGlowColor * (maxIntensity * storedPower / capacity));
+        }
     }
 
     /**
      * Stores power and returns the excess it could not store
      */
-    internal float StorePower(float power)
+    public float StorePower(float power)
     {
+        if (storedPower >= capacity)
+        {
+            return power;
+        }
+
         if (power + storedPower > capacity)
         {
             float excess = power + storedPower - capacity;
             storedPower = capacity;
+            UpdateGlow();
             return excess;
         }
         else
         {
             storedPower += power;
+            UpdateGlow();
             return 0;
         }
     }
 
-    internal float GetPower()
+    public float GetPower()
     {
         return storedPower;
     }
@@ -53,17 +84,24 @@ public class Battery : MonoBehaviour {
     /**
      * Consumes power and returns the ammount it could not consume
      */
-    internal float ConsumePower(float power)
+    public float ConsumePower(float power)
     {
+        if (storedPower <= 0)
+        {
+            return power;
+        }
+
         if (power > storedPower)
         {
             float rest = power - storedPower;
             storedPower = 0;
+            UpdateGlow();
             return rest;
         }
         else
         {
             storedPower -= power;
+            UpdateGlow();
             return 0;
         }
     }

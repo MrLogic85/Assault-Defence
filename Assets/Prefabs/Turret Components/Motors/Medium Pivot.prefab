@@ -172,7 +172,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 136144}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.671985, y: 2.7015442e-15, z: -7.4257784}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 440310}
@@ -438,8 +438,9 @@ MonoBehaviour:
     maxAngle: 360
   - joint: {fileID: 461818}
     maxAngle: 20
-  turnSpeed: 30
+  turnSpeed: 15
   maxWeight: 90
+  powerConsumption: 10
 --- !u!114 &11423254
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -469,6 +470,7 @@ MonoBehaviour:
     armament: 2
   slots:
   - {fileID: 11423254}
+  weight: 0
 --- !u!136 &13693020
 CapsuleCollider:
   m_ObjectHideFlags: 1

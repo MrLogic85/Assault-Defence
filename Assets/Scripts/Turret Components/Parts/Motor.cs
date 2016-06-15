@@ -2,16 +2,18 @@
 using System;
 using System.Collections.Generic;
 
-[RequireComponent (typeof (TurretComponent))]
+[RequireComponent(typeof(TurretComponent))]
 [ExecuteInEditMode]
 public class Motor : MonoBehaviour
 {
     public Joint[] engineJoints;
     [Header("Motor")]
-    [Tooltip ("Degrees per second")]
+    [Tooltip("Degrees per second")]
     public float turnSpeed = 20;
     [Tooltip("Max weight in kilos before the motor stops")]
     public float maxWeight = 90;
+    [Tooltip("The power needed per second to turn the motor")]
+    public float powerConsumption;
 
     private TurretComponent component;
     private float lastDierction = 1;
@@ -19,7 +21,7 @@ public class Motor : MonoBehaviour
     void Awake()
     {
         component = GetComponent<TurretComponent>();
-        component.componentAimWeight.Add(GetAimOffsetWeight);
+        component.onComponenGetAimWeightEvent.Add(GetAimOffsetWeight);
 
         if (component.parentComponent != null)
         {
@@ -32,14 +34,29 @@ public class Motor : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update () {
+    void Update()
+    {
         RotateTowardsTarget();
+    }
+
+    private void ConsumePower()
+    {
+        Turret turret;
+        if (component.GetTurret(out turret))
+        {
+            turret.ConsumePower(powerConsumption * Time.deltaTime);
+        }
     }
 
     private void RotateTowardsTarget()
     {
         for (int i = 0; i < engineJoints.Length; i++)
         {
+            Turret turret;
+            if (component.GetTurret(out turret) && turret.GetStoredPower() < powerConsumption * Time.deltaTime)
+            {
+                break;
+            }
             Joint engineJoint = engineJoints[i];
             float step = turnSpeed * Time.deltaTime;
             float currentRotation = engineJoint.joint.localRotation.eulerAngles.y;
@@ -59,10 +76,11 @@ public class Motor : MonoBehaviour
                 if (Math.Abs(currentRotation) > step)
                 {
                     engineJoint.joint.Rotate(0, -Math.Sign(currentRotation) * step, 0);
+                    ConsumePower();
                 }
                 continue;
             }
-            
+
             // Try to rotate in lastDirection
             if (engineJoint.maxAngle >= 360 || Math.Abs(currentRotation + lastDierction * step) <= engineJoint.maxAngle)
             {
@@ -71,6 +89,7 @@ public class Motor : MonoBehaviour
                 component.GetAimOffsetWeight(out newOffset);
                 if (newOffset < offset)
                 {
+                    ConsumePower();
                     continue;
                 }
                 else
@@ -80,7 +99,7 @@ public class Motor : MonoBehaviour
             }
 
             // Try the other direction
-            if (engineJoint.maxAngle >=360 || Math.Abs(currentRotation - lastDierction * step) <= engineJoint.maxAngle)
+            if (engineJoint.maxAngle >= 360 || Math.Abs(currentRotation - lastDierction * step) <= engineJoint.maxAngle)
             {
                 engineJoint.joint.Rotate(0, -lastDierction * step, 0);
                 float newOffset;
@@ -88,6 +107,7 @@ public class Motor : MonoBehaviour
                 if (newOffset < offset)
                 {
                     lastDierction *= -1;
+                    ConsumePower();
                     continue;
                 }
                 else

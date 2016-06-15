@@ -10,6 +10,8 @@ GameObject:
   - 4: {fileID: 459878}
   - 114: {fileID: 11486406}
   - 114: {fileID: 11403526}
+  - 114: {fileID: 11406466}
+  - 114: {fileID: 11480612}
   m_Layer: 9
   m_Name: Base Medium
   m_TagString: Untagged
@@ -226,6 +228,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 076945f466a595d499792aef522ceb95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &11406466
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 116238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2879d9310ce43764aabbc7b28f0d7a6a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  production: 5
+--- !u!114 &11480612
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 116238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 65d187deb29891a43ac2dc2fb9f310a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  capacity: 5
+  glowMaterial: {fileID: 0}
+  maxIntensity: 1
 --- !u!114 &11486406
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -242,6 +270,7 @@ MonoBehaviour:
     armament: 0
   slots:
   - {fileID: 11488160}
+  weight: 0
 --- !u!114 &11488160
 MonoBehaviour:
   m_ObjectHideFlags: 1
