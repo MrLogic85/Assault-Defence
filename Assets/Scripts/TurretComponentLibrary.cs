@@ -46,7 +46,7 @@ public class TurretComponentLibrary : MonoBehaviour
                 // Make sure tha armament type can fit in the slot
                 continue;
             }
-            if (filter != null && component.GetType() != filter)
+            if (filter != null && component.GetComponent(filter) == null)
             {
                 // Make sure the object is of the corect type
                 continue;

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using System;
 
 public class TurretComponent : MonoBehaviour
@@ -9,10 +9,14 @@ public class TurretComponent : MonoBehaviour
     public Fitting fitting;
     public Slot[] slots;
 
-    internal Action onFittedEvent;
-
     internal Enemy target;
     internal TurretComponent parentComponent;
+    internal Armament fittedOnArmamanet;
+
+    // ==== EVENTS ====
+    internal Action<TurretComponent, Armament> onFittedEvent;
+    // In params, current aim offset, has children target. Retuns new aim and if component wants to aim or not
+    internal List<Func<float, bool, KeyValuePair<float, bool>>> componentAimWeight = new List<Func<float, bool, KeyValuePair<float, bool>>>();
 
     public void Start()
     {
@@ -55,9 +59,10 @@ public class TurretComponent : MonoBehaviour
     internal virtual void FittedOn(TurretComponent component, Armament armament)
     {
         parentComponent = component;
+        fittedOnArmamanet = armament;
         if (onFittedEvent != null)
         {
-            onFittedEvent.Invoke();
+            onFittedEvent.Invoke(component, armament);
         }
     }
 
@@ -65,6 +70,7 @@ public class TurretComponent : MonoBehaviour
     {
         bool hasTarget = false;
         offset = 0;
+        // Check depth first for aim
         foreach (Slot slot in slots)
         {
             if (slot.component != null)
@@ -75,6 +81,16 @@ public class TurretComponent : MonoBehaviour
                     offset += getOffset;
                     hasTarget = true;
                 }
+            }
+        }
+        // Let each component modify the aim, a motor will for instance reduce the offset and a weapon will add the the offset
+        foreach (Func<float, bool, KeyValuePair<float, bool>> aimMethod in componentAimWeight)
+        {
+            KeyValuePair<float, bool> result = aimMethod(offset, hasTarget);
+            if (result.Value)
+            {
+                offset = result.Key;
+                hasTarget = true;
             }
         }
         return hasTarget;

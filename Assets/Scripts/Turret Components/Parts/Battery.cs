@@ -22,7 +22,7 @@ public class Battery : MonoBehaviour {
         }
     }
 
-    private void Fitted()
+    private void Fitted(TurretComponent component, Armament arment)
     {
         component.GetTurret().RegisterBatery(this);
     }

@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System;
+using System.Collections.Generic;
 
-public class Motor : TurretComponent
+[RequireComponent (typeof (TurretComponent))]
+[ExecuteInEditMode]
+public class Motor : MonoBehaviour
 {
     public Joint[] engineJoints;
     [Header("Motor")]
@@ -9,8 +12,24 @@ public class Motor : TurretComponent
     public float turnSpeed = 20;
     [Tooltip("Max weight in kilos before the motor stops")]
     public float maxWeight = 90;
-    
+
+    private TurretComponent component;
     private float lastDierction = 1;
+
+    void Awake()
+    {
+        component = GetComponent<TurretComponent>();
+        component.componentAimWeight.Add(GetAimOffsetWeight);
+
+        if (component.parentComponent != null)
+        {
+            Fitted(component.parentComponent, component.fittedOnArmamanet);
+        }
+        else
+        {
+            component.onFittedEvent += Fitted;
+        }
+    }
 
     // Update is called once per frame
     void Update () {
@@ -34,9 +53,9 @@ public class Motor : TurretComponent
             }
 
             float offset = 0;
-            if (!base.GetAimOffsetWeight(out offset))
+            if (!component.GetAimOffsetWeight(out offset))
             {
-                // Reset rotation
+                // Reset rotation to forward
                 if (Math.Abs(currentRotation) > step)
                 {
                     engineJoint.joint.Rotate(0, -Math.Sign(currentRotation) * step, 0);
@@ -49,7 +68,7 @@ public class Motor : TurretComponent
             {
                 engineJoint.joint.Rotate(0, lastDierction * step, 0);
                 float newOffset;
-                base.GetAimOffsetWeight(out newOffset);
+                component.GetAimOffsetWeight(out newOffset);
                 if (newOffset < offset)
                 {
                     continue;
@@ -65,7 +84,7 @@ public class Motor : TurretComponent
             {
                 engineJoint.joint.Rotate(0, -lastDierction * step, 0);
                 float newOffset;
-                base.GetAimOffsetWeight(out newOffset);
+                component.GetAimOffsetWeight(out newOffset);
                 if (newOffset < offset)
                 {
                     lastDierction *= -1;
@@ -80,18 +99,19 @@ public class Motor : TurretComponent
     }
 
     // A motor has the same armament as the slot it was fitted on.
-    internal override void FittedOn(TurretComponent component, Armament armament)
+    private void Fitted(TurretComponent parentComponent, Armament armament)
     {
-        base.FittedOn(component, armament);
-        slots[0].armament = armament;
+        component.slots[0].armament = armament;
     }
 
-    internal override bool GetAimOffsetWeight(out float offset)
+    public KeyValuePair<float, bool> GetAimOffsetWeight(float childrenOffset, bool childrenIsAiming)
     {
         // Return a smaller value for motors to decrease the weight of weapons which has their own motors
-        bool hasTarget = base.GetAimOffsetWeight(out offset);
-        offset /= 2f;
-        return hasTarget;
+        if (childrenIsAiming)
+        {
+            return new KeyValuePair<float, bool>(childrenOffset / 2f, true);
+        }
+        return new KeyValuePair<float, bool>(childrenOffset, false);
     }
 
     private Vector3 ProjectPointOnPlane(Vector3 planeNormal, Vector3 planePoint, Vector3 point)

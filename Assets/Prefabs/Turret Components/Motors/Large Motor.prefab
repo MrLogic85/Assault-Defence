@@ -8,6 +8,7 @@ GameObject:
   serializedVersion: 4
   m_Component:
   - 4: {fileID: 468032}
+  - 114: {fileID: 11443032}
   - 114: {fileID: 11416688}
   m_Layer: 9
   m_Name: Large Motor
@@ -128,7 +129,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 155766}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -2.933728, y: 3.2669908e-15, z: -7.1783752}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 415132}
@@ -224,11 +225,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce1dac4de0fecab44ab9975f37bb9501, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fitting:
-    size: 2
-    armament: 2
-  slots:
-  - {fileID: 11440784}
   engineJoints:
   - joint: {fileID: 434136}
     maxAngle: 360
@@ -247,6 +243,22 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   armament: 0
   size: 2
+--- !u!114 &11443032
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 155766}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ca4344f96badc345b64ce9c91d267dd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fitting:
+    size: 2
+    armament: 2
+  slots:
+  - {fileID: 11440784}
 --- !u!136 &13618696
 CapsuleCollider:
   m_ObjectHideFlags: 1
