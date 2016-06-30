@@ -22,28 +22,8 @@ public class TurretComponent : MonoBehaviour
 
     public void Awake()
     {
-
-    }
-
-    public void Start()
-    {
-        //FindComponents();
-    }
-
-    private void FindComponents()
-    {
-        foreach (Slot slot in slots)
-        {
-            foreach (Transform child in slot.transform)
-            {
-                slot.component = child.gameObject.GetComponent<TurretComponent>();
-                if (slot.component != null)
-                {
-                    slot.component.FittedOn(this, slot.armament);
-                    break;
-                }
-            }
-        }
+        // Having declared this methods makes the
+        // component available for other scripts Awake method
     }
 
     internal virtual bool GetTurret(out Turret turret)
@@ -78,6 +58,20 @@ public class TurretComponent : MonoBehaviour
         }
     }
 
+    internal float GetChildTotalWeight()
+    {
+        float weight = 0;
+        foreach (Slot slot in slots)
+        {
+            if (slot.component != null)
+            {
+                weight += slot.component.weight;
+                weight += slot.component.GetChildTotalWeight();
+            }
+        }
+        return weight;
+    }
+
     internal virtual bool GetAimOffsetWeight(out float offset)
     {
         bool hasTarget = false;
@@ -108,12 +102,13 @@ public class TurretComponent : MonoBehaviour
         return hasTarget;
     }
 
-    internal void InstantiateComponentAt(TurretComponent comp, Slot slot)
+    internal TurretComponent InstantiateComponentAt(TurretComponent comp, Slot slot)
     {
         TurretComponent instance = Instantiate(comp, slot.transform.position, slot.transform.rotation) as TurretComponent;
         instance.transform.parent = slot.transform;
         slot.component = instance;
         instance.FittedOn(this, slot.armament);
+        return instance;
     }
 
     // ==== DEBUG ====
@@ -127,9 +122,27 @@ public class TurretComponent : MonoBehaviour
                 TurretComponent[] components = library.GetComponentsMatching(slot);
                 if (components.Length > 0)
                 {
-                    TurretComponent baseComponent = components[UnityEngine.Random.Range(0, components.Length)];
-                    InstantiateComponentAt(baseComponent, slot);
+                    TurretComponent turretComponent = components[UnityEngine.Random.Range(0, components.Length)];
+                    InstantiateComponentAt(turretComponent, slot);
                     slot.component.BuildRandom();
+                }
+            }
+        }
+    }
+
+    internal virtual void BuildRandom(int[] generateIds)
+    {
+        TurretComponentLibrary library = FindObjectOfType<TurretComponentLibrary>();
+        if (library != null)
+        {
+            for (int i = 0; i < slots.Length && i < generateIds.Length; i++)
+            {
+                TurretComponent[] components = library.GetComponentsMatching(slots[i]);
+                if (components.Length > 0 && generateIds[i] < components.Length && generateIds[i] >= 0)
+                {
+                    TurretComponent turretComponent = components[generateIds[i]];
+                    InstantiateComponentAt(turretComponent, slots[i]);
+                    slots[i].component.BuildRandom(Util.Subset(generateIds, slots.Length));
                 }
             }
         }

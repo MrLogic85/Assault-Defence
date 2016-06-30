@@ -7,7 +7,7 @@ public class Spawner : MonoBehaviour {
     [Range (0, 100)] public float spawnDelay = 10;
     [Range (0, 100)] public float spawnDelayVariation = 10;
 
-    private Enemy enemy;
+    private GameObject enemy;
     private float nextSpawnTime;
 
 	// Use this for initialization
@@ -19,10 +19,10 @@ public class Spawner : MonoBehaviour {
 	// Update is called once per frame
 	void Update ()
     {
-        if (nextSpawnTime < Time.time && (enemy == null || enemy.Hitpoints <= 0))
+        if (nextSpawnTime < Time.time && enemy == null)
         {
-            GameObject obj = Instantiate(enemyPrefab, transform.position, transform.rotation) as GameObject;
-            enemy = obj.GetComponent<Enemy>();
+            enemy = (GameObject) Instantiate(enemyPrefab, transform.position, transform.rotation);
+            enemy.AddComponent<Enemy>();
             nextSpawnTime = Random.Range(-spawnDelayVariation / 2f, spawnDelayVariation / 2f) + spawnDelay + Time.time;
         }
 	}

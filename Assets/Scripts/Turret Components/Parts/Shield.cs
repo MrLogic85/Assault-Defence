@@ -11,7 +11,7 @@ public class Shield : TurretComponent {
 
     private Vector3 GetAimDirection()
     {
-        if (HasTarget())
+        if (HasTarget() && target.aimPoint != null)
         {
             Vector3 targetPos = target.aimPoint.transform.position;
             return targetPos - transform.position;

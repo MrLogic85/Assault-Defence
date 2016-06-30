@@ -124,7 +124,7 @@ public class Weapon : TurretComponent
 
     private Vector3 GetAimDirection()
     {
-        if (HasTarget())
+        if (HasTarget() && target.aimPoint != null)
         {
             Vector3 targetPos = target.aimPoint.transform.position;
             Vector3 spawnPos, spawnForward;

@@ -48,7 +48,6 @@ public class Turret : MonoBehaviour
 
     internal void RegisterBatery(Battery battery)
     {
-        print("Battery registered");
         batteries.Add(battery);
     }
 
@@ -64,7 +63,6 @@ public class Turret : MonoBehaviour
                     break;
                 }
             }
-            print("Producing power. Power stored " + GetStoredPower() + "/" + GetPowerCapacity());
         }
     }
 
@@ -96,7 +94,6 @@ public class Turret : MonoBehaviour
             {
                 power = battery.ConsumePower(power);
             }
-            print("Consuming power. Power stored " + GetStoredPower() + "/" + GetPowerCapacity());
             return true;
         }
         return false;

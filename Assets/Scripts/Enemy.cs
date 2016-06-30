@@ -22,6 +22,15 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         hitpoints = maxHitpoints;
+        TurretBasePos pos = GetComponent<TurretBasePos>();
+        if (pos != null)
+        {
+            pos.DebugCreateNewTurret();
+        }
+        if (aimPoint == null)
+        {
+            aimPoint = transform;
+        }
     }
 
     // Update is called once per frame

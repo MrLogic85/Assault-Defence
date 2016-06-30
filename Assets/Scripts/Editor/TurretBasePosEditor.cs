@@ -8,7 +8,19 @@ public class TurretBasePosEditor : Editor
     private TurretBasePos turretBase;
     public override void OnInspectorGUI()
     {
-        base.OnInspectorGUI();
+        if (DrawDefaultInspector())
+        {
+            Rebuild();
+        }
+
+        if (GUILayout.Button("Rebuild"))
+        {
+            Rebuild();
+        }
+    }
+
+    private void Rebuild()
+    {
         turretBase = target as TurretBasePos;
         if (turretBase.gameObject.activeInHierarchy)
         {

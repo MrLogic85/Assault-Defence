@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 [RequireComponent (typeof (Turret))]
 public class Base : TurretComponent
@@ -14,6 +15,16 @@ public class Base : TurretComponent
         }
         _turret = turret;
         return turret != null;
+    }
+
+    private bool hasPrintedWeight = false;
+    void Update()
+    {
+        if (!hasPrintedWeight)
+        {
+            print("Total weight " + GetChildTotalWeight());
+            hasPrintedWeight = true;
+        }
     }
 
     // ==== DEBUG ====
